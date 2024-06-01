@@ -22,18 +22,19 @@ public class FileReader implements DataReader{
             BufferedReader bufferedReader = new BufferedReader(reader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                String[] parts = line.split(",");
+                String[] parts = line.split(", ");
                 if (parts.length != 4) {
-                    bufferedReader.close();               
+                    bufferedReader.close();
                     throw new IOException("Invalid data format in file: " + fileName);
                 }
-                System.out.println(parts[0]);
-                parts[0] = parts[0].
+                parts[0] = parts[0].substring("Patient ID: ".length());
+                parts[1] = parts[1].substring("Timestamp: ".length());
+                parts[2] = parts[2].substring("Label: ".length());
+                parts[3] = parts[3].substring("Data: ".length());
                 int patientId = Integer.parseInt(parts[0]);
-                System.out.println(patientId);
-                double measurementValue = Double.parseDouble(parts[1]);
+                long timestamp = Long.parseLong(parts[1]);
                 String recordType = parts[2];
-                long timestamp = Long.parseLong(parts[3]);
+                double measurementValue = Double.parseDouble(parts[3]);
                 dataStorage.addPatientData(patientId, measurementValue, recordType, timestamp);
             }
             bufferedReader.close();               
@@ -45,14 +46,13 @@ public class FileReader implements DataReader{
     public static void main(String[] args) {
         DataStorage storage = new DataStorage();
         DataReader reader = new FileReader("output\\ECG.txt");
+        System.out.println(storage.getAllPatients().size());
         try {
             reader.readData(storage);
         } catch (Exception e) {
             // TODO: handle exception
         }
-        List<Patient> patients = (ArrayList<Patient>)storage.getAllPatients();
-        for (Patient patient : patients) {
-            System.out.println(patient);
-            }
+        List<Patient> patients = storage.getAllPatients();
+        System.out.println(patients.size());
         }
 }

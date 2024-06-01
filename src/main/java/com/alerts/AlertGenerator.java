@@ -1,7 +1,9 @@
 package com.alerts;
 
-import com.data_management.DataStorage;
-import com.data_management.Patient;
+import com.data_management.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
@@ -35,7 +37,50 @@ public class AlertGenerator {
      * @param patient the patient data to evaluate for alert conditions
      */
     public void evaluateData(Patient patient) {
-        // Implementation goes here
+        evaluateBloodPressure(patient);
+        evaluateBloodSaturation(patient);
+
+    }
+
+    private void evaluateBloodSaturation(Patient patient) {
+
+    }
+
+    /**
+     * Evaluates the patient's blood pressure data to determine if any alert
+     * conditions are met. If a condition is met, an alert is triggered via the
+     * {@link #triggerAlert} method.
+     *
+     * @param patient the patient data to evaluate for blood pressure alert
+     *                conditions
+     */
+    public void evaluateBloodPressure(Patient patient) {
+        /* Critical Threshold Alert: Trigger an alert if the systolic blood pressure exceeds 180
+         * mmHg or drops below 90 mmHg, or if diastolic blood pressure exceeds 120 mmHg or
+         * drops below 60 mmHg
+         */
+        List<PatientRecord> records = patient.getLastThreeRecords();
+        PatientRecord record = records.getFirst();
+        if (record.getRecordType().equals("SystolicPressure") &&
+                record.getMeasurementValue() > 180 || record.getMeasurementValue() < 90){
+            triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical threshold", record.getTimestamp()));
+        }
+        if (record.getRecordType().equals("DiastolicPressure") &&
+                record.getMeasurementValue() > 120 || record.getMeasurementValue() < 60){
+            triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical threshold", record.getTimestamp()));
+        }
+        /*
+         * Trend Alert: Trigger an alert if the patient's blood pressure (systolic or diastolic) shows a
+         * consistent increase or decrease across three consecutive readings where each reading
+         * changes by more than 10 mmHg from the last.
+         */
+        if (records.size() == 3) {
+            double diff1 = Math.abs(records.get(0).getMeasurementValue() - records.get(1).getMeasurementValue());
+            double diff2 = Math.abs(records.get(1).getMeasurementValue() - records.get(2).getMeasurementValue());
+            if (diff1 > 10 && diff2 > 10) {
+                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Trend", record.getTimestamp()));
+            }
+        }
     }
 
     /**
@@ -48,5 +93,18 @@ public class AlertGenerator {
      */
     private void triggerAlert(Alert alert) {
         // Implementation might involve logging the alert or notifying staff
+        System.out.println("ALERT: " + alert.toString());
+    }
+
+    public static void main(String[] args) {
+        DataStorage storage = new DataStorage();
+        DataReader reader = new FileReader("output\\ECG.txt");
+        AlertGenerator alertGenerator = new AlertGenerator(storage);
+        try {
+            reader.readData(storage);
+        } catch (Exception e) {}
+        for (Patient patient : storage.getAllPatients()) {
+            alertGenerator.evaluateData(patient);
+        }
     }
 }

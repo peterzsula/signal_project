@@ -52,6 +52,29 @@ public class Patient {
      *         range
      */
     public List<PatientRecord> getRecords(long startTime, long endTime) {
-        // TODO Implement and test this method
+        List<PatientRecord> recordsInRange = new ArrayList<>();
+        for (PatientRecord record : this.patientRecords) {
+            if (record.getTimestamp() >= startTime && record.getTimestamp() <= endTime) {
+                recordsInRange.add(record);
+            }
+        }
+        return recordsInRange;
+    }
+
+    /**
+     * Retrieves the last three records for this patient.
+     * If the patient has fewer than three records, the method returns an empty list.
+     *
+     * @return a list of the last three PatientRecord objects for this patient
+     */
+    public List<PatientRecord> getLastThreeRecords() {
+        ArrayList<PatientRecord> lastThreeRecords = new ArrayList<>();
+        int size = this.patientRecords.size();
+        if (size >= 3) {
+            lastThreeRecords.add(this.patientRecords.get(size - 3));
+            lastThreeRecords.add(this.patientRecords.get(size - 2));
+            lastThreeRecords.add(this.patientRecords.get(size - 1));
+        }
+        return lastThreeRecords;
     }
 }
