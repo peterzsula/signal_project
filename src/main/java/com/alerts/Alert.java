@@ -32,4 +32,15 @@ public class Alert {
                 ", timestamp=" + timestamp +
                 '}';
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Alert alert = (Alert) obj;
+        return timestamp == alert.timestamp && patientId.equals(alert.patientId) && condition.equals(alert.condition);
+    }
 }

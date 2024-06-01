@@ -10,43 +10,57 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AlertGenerationTest {
     @Test
-    void testBloodPressureIncrease() {
-        Patient patient = new Patient(1);
-        patient.addRecord(180, "BloodPressure", 1714376789050L);
-        patient.addRecord(200, "BloodPressure", 1714376789050L);
-        patient.addRecord(220, "BloodPressure", 1714376789050L);
+    void testBloodPressureIncreasingTrend() {
         DataStorage dataStorage = new DataStorage();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+        Patient patient = new Patient(1);
+        patient.addRecord(100, "SystolicPressure", 1);
+        patient.addRecord(120, "SystolicPressure", 1);
+        patient.addRecord(140, "SystolicPressure", 1);
+
         alertGenerator.evaluateData(patient);
         Alert alert = alertGenerator.getLastAlert();
-        assertNotNull(alert);
+        assert alert.equals(new Alert("1", "Trend", 1));
     }
     @Test
-    void testBloodPressureDecrease() {
-        Patient patient = new Patient(1);
-        patient.addRecord(100, "BloodPressure", 1714376789050L);
-        patient.addRecord(80, "BloodPressure", 1714376789050L);
-        patient.addRecord(60, "BloodPressure", 1714376789050L);
+    void testBloodPressureDecreasingTrend() {
         DataStorage dataStorage = new DataStorage();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+        Patient patient = new Patient(2);
+        patient.addRecord(140, "SystolicPressure", 2);
+        patient.addRecord(120, "SystolicPressure", 2);
+        patient.addRecord(100, "SystolicPressure", 2);
+
+
         alertGenerator.evaluateData(patient);
         Alert alert = alertGenerator.getLastAlert();
-        assertNotNull(alert);
+        assert alert.equals(new Alert("2", "Trend", 2));
     }
+
     @Test
     void testCriticalThresholds() {
-        Patient patient = new Patient(1);
         DataStorage dataStorage = new DataStorage();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+        Patient patient = new Patient(3);
 
-        patient.addRecord(159, "SystolicBloodPressure", 1714376789050L);
-        patient.addRecord(159, "SystolicBloodPressure", 1714376789050L);
-        patient.addRecord(119, "DiastolicBloodPressure", 1714376789050L);
-        patient.addRecord(61, "DiastolicBloodPressure", 1714376789050L);
-
+        patient.addRecord(181, "SystolicPressure", 3);
         alertGenerator.evaluateData(patient);
-
         Alert alert = alertGenerator.getLastAlert();
-        assertNotNull(alert);
+        assert alert.equals(new Alert("3", "Critical threshold", 3));
+
+        patient.addRecord(89, "SystolicPressure", 3);
+        alertGenerator.evaluateData(patient);
+        alert = alertGenerator.getLastAlert();
+        assert alert.equals(new Alert("3", "Critical threshold", 3));
+
+        patient.addRecord(121, "DiastolicPressure", 3);
+        alertGenerator.evaluateData(patient);
+        alert = alertGenerator.getLastAlert();
+        assert alert.equals(new Alert("3", "Critical threshold", 3));
+
+        patient.addRecord(59, "DiastolicPressure", 3);
+        alertGenerator.evaluateData(patient);
+        alert = alertGenerator.getLastAlert();
+        assert alert.equals(new Alert("3", "Critical threshold", 3));
     }
 }

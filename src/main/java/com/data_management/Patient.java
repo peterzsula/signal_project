@@ -62,19 +62,38 @@ public class Patient {
     }
 
     /**
-     * Retrieves the last three records for this patient.
-     * If the patient has fewer than three records, the method returns an empty list.
+     * Retrieves the last n records for this patient.
      *
-     * @return a list of the last three PatientRecord objects for this patient
+     * @return a list of the last n PatientRecord objects for this patient
      */
-    public List<PatientRecord> getLastThreeRecords() {
-        ArrayList<PatientRecord> lastThreeRecords = new ArrayList<>();
+    public List<PatientRecord> getLastNRecords(int n) {
+        ArrayList<PatientRecord> lastNRecords = new ArrayList<>();
         int size = this.patientRecords.size();
-        if (size >= 3) {
-            lastThreeRecords.add(this.patientRecords.get(size - 3));
-            lastThreeRecords.add(this.patientRecords.get(size - 2));
-            lastThreeRecords.add(this.patientRecords.get(size - 1));
+        for (int i = 0; i < n && i < size; i++) {
+            lastNRecords.add(this.patientRecords.get(size - 1 - i));
         }
-        return lastThreeRecords;
+        return lastNRecords;
+    }
+    /**
+     * Adds all the records that match the given label to a new list
+     * @param label the label to filter the records by
+     * @param records the list of records to filter
+     * @return a list of records that match the given label
+     */
+    public static List<PatientRecord> filterRecordsBasedOnLabel(String label, List<PatientRecord> records) {
+        List<PatientRecord> filteredRecords = new ArrayList<>();
+        for (PatientRecord record : records) {
+            if (record.getRecordType().equals(label)) {
+                filteredRecords.add(record);
+            }
+        }
+        return filteredRecords;
+    }
+    public static List<PatientRecord> filterRecordsBasedOnLabels(List<String> labels, List<PatientRecord> records) {
+        List<PatientRecord> filteredRecords = new ArrayList<>();
+        for (String label : labels) {
+            filteredRecords.addAll(filterRecordsBasedOnLabel(label, records));
+        }
+        return filteredRecords;
     }
 }
