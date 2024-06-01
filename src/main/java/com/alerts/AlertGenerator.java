@@ -2,7 +2,6 @@ package com.alerts;
 
 import com.data_management.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +11,7 @@ import java.util.List;
  * it against specific health criteria.
  */
 public class AlertGenerator {
+    private Alert lastAlert;
     private DataStorage dataStorage;
 
     /**
@@ -60,7 +60,7 @@ public class AlertGenerator {
          * drops below 60 mmHg
          */
         List<PatientRecord> records = patient.getLastThreeRecords();
-        PatientRecord record = records.getFirst();
+        PatientRecord record = records.get(0);
         if (record.getRecordType().equals("SystolicPressure") &&
                 record.getMeasurementValue() > 180 || record.getMeasurementValue() < 90){
             triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical threshold", record.getTimestamp()));
@@ -91,9 +91,14 @@ public class AlertGenerator {
      *
      * @param alert the alert object containing details about the alert condition
      */
+
     private void triggerAlert(Alert alert) {
-        // Implementation might involve logging the alert or notifying staff
+        this.lastAlert = alert;
         System.out.println("ALERT: " + alert.toString());
+    }
+
+    public Alert getLastAlert() {
+        return lastAlert;
     }
 
     public static void main(String[] args) {
