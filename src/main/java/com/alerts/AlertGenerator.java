@@ -2,6 +2,7 @@ package com.alerts;
 
 import com.data_management.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,7 +61,7 @@ public class AlertGenerator {
     }
 
     /**
-     * Evaluates the patient's blood pressure data to determine if any alert
+     * Evaluates the patient's LATEST(!) blood pressure data to determine if any alert
      * conditions are met. If a condition is met, an alert is triggered via the
      * {@link #triggerAlert} method.
      *
@@ -72,14 +73,14 @@ public class AlertGenerator {
          * mmHg or drops below 90 mmHg, or if diastolic blood pressure exceeds 120 mmHg or
          * drops below 60 mmHg
          */
-        List<PatientRecord> records = patient.getLastThreeRecords();
-        PatientRecord record = records.get(0);
+        // Get the latest record
+        PatientRecord record = patient.getLastNRecords(1).get(0);
         if (record.getRecordType().equals("SystolicPressure") &&
-                record.getMeasurementValue() > 180 || record.getMeasurementValue() < 90){
+                (record.getMeasurementValue() > 180 || record.getMeasurementValue() < 90)){
             triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical threshold", record.getTimestamp()));
         }
-        if (record.getRecordType().equals("DiastolicPressure") &&
-                record.getMeasurementValue() > 120 || record.getMeasurementValue() < 60){
+        else if (record.getRecordType().equals("DiastolicPressure") &&
+                (record.getMeasurementValue() > 120 || record.getMeasurementValue() < 60)){
             triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical threshold", record.getTimestamp()));
         }
         /*
@@ -87,6 +88,7 @@ public class AlertGenerator {
          * consistent increase or decrease across three consecutive readings where each reading
          * changes by more than 10 mmHg from the last.
          */
+        List<PatientRecord> records = Patient.filterRecordsBasedOnLabel(record.getRecordType(),patient.getLastNRecords(3));
         if (records.size() == 3) {
             double diff1 = Math.abs(records.get(0).getMeasurementValue() - records.get(1).getMeasurementValue());
             double diff2 = Math.abs(records.get(1).getMeasurementValue() - records.get(2).getMeasurementValue());
