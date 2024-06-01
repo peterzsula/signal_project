@@ -49,4 +49,20 @@ public class AlertGenerationTest {
         Alert alert = alertGenerator.getLastAlert();
         assertNotNull(alert);
     }
+    @Test
+    void testBloodSaturationThresholds() {
+        Patient patient = new Patient(1);
+        DataStorage dataStorage = new DataStorage();
+        AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+
+        patient.addRecord(91, "BloodSaturation", System.currentTimeMillis() - 1000*60*10);
+        patient.addRecord(90, "BloodSaturation", System.currentTimeMillis() - 1000*60*7);
+        patient.addRecord(89, "BloodSaturation", System.currentTimeMillis() - 1000*60*3);
+        patient.addRecord(85, "BloodSaturation", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        Alert alert = alertGenerator.getLastAlert();
+        assertNotNull(alert);
+    }
 }

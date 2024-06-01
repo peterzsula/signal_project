@@ -43,7 +43,20 @@ public class AlertGenerator {
     }
 
     private void evaluateBloodSaturation(Patient patient) {
+        List<PatientRecord> lastTenMinutes = patient.getLastTenMinutes();
+        boolean flag = false;
+        for(PatientRecord record : lastTenMinutes) {
+            if(record.getMeasurementValue() < 92.0) {
+                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Low Saturation", System.currentTimeMillis()));
+            }
 
+            if((lastTenMinutes.get(0).getMeasurementValue() - record.getMeasurementValue() > 5 ||
+            lastTenMinutes.get(0).getMeasurementValue() - record.getMeasurementValue() < -5) &&
+            flag == false) {
+                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Rapid drop", System.currentTimeMillis()));
+                flag = true;
+            }
+        }
     }
 
     /**

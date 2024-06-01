@@ -77,4 +77,9 @@ public class Patient {
         }
         return lastThreeRecords;
     }
+
+    public List<PatientRecord> getLastTenMinutes() {
+        List<PatientRecord> recordsInRange = getRecords(System.currentTimeMillis()-1000*60*10, System.currentTimeMillis());
+        return recordsInRange;
+    }
 }

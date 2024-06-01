@@ -15,7 +15,6 @@ class DataStorageTest {
 
     @Test
     void testAddAndGetRecords() {
-        // TODO Perhaps you can implement a mock data reader to mock the test data?
         DataReader reader = new FileReader("output\\ECG.txt");
         DataStorage storage = new DataStorage();
         storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
