@@ -50,6 +50,8 @@ public class AlertGenerator {
             case "DiastolicPressure":
                 evaluateBloodPressure(patient);
                 break;
+            case "ECG":
+                evaluateECG(patient);
         }
     }
 
@@ -97,6 +99,23 @@ public class AlertGenerator {
         if(lastTenMinutes.get(0).getMeasurementValue() < 92.0) {
             triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Low Saturation",
                     lastRecord.getTimestamp()));
+        }
+    }
+
+    public void evaluateECG(Patient patient) {
+        List<PatientRecord> lastTenMinutes = Patient.filterRecordsBasedOnLabel("ECG",
+                patient.getLastTenMinutes());
+        double sum = 0;
+        for (PatientRecord record : lastTenMinutes) {
+            sum  += record.getMeasurementValue();
+        }
+        double average = sum/lastTenMinutes.size();
+        for (PatientRecord record : lastTenMinutes) {
+            double measure = record.getMeasurementValue();
+            if(measure >= average + 1 || measure <= average - 1) {
+                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Abnormal ECG",
+                        record.getTimestamp()));
+            }
         }
     }
 

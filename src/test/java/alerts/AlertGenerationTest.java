@@ -156,4 +156,18 @@ public class AlertGenerationTest {
         Alert alert = alertGenerator.getLastAlert();
         assert alert.equals(new Alert("6", "Hypotensive Hypoxemia", time));
     }
+
+    @Test
+    void testECG() {
+        DataStorage dataStorage = new DataStorage();
+        AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+        Patient patient = new Patient(7);
+        long time = System.currentTimeMillis();
+        patient.addRecord(0, "ECG", time);
+        patient.addRecord(2, "ECG", time+1);
+        alertGenerator.evaluateData(patient);
+        Alert alert = alertGenerator.getLastAlert();
+        assert alert.equals(new Alert("7", "Abnormal ECG", time+1));
+    }
+
 }
