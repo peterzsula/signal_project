@@ -47,6 +47,9 @@ public class AlertGenerator {
                 hypotensiveHypoxemiaAlert(patient);
                 break;
             case "SystolicPressure":
+                evaluateBloodPressure(patient);
+                hypotensiveHypoxemiaAlert(patient);
+                break;
             case "DiastolicPressure":
                 evaluateBloodPressure(patient);
                 break;
@@ -67,22 +70,36 @@ public class AlertGenerator {
         List<PatientRecord> lastTenMinutes = Patient.filterRecordsBasedOnLabels(labels,
                 patient.getLastTenMinutes());
         PatientRecord lastRecord = patient.getLastNRecords(1).get(0);
-        if (!lastRecord.getRecordType().equals("Saturation")){
-            throw new IllegalArgumentException("The last record is not a saturation record");
-        }
-        try {
-            for (PatientRecord currentRecord : lastTenMinutes) {
-                if (currentRecord.getRecordType().equals("SystolicPressure")) {
-                    if(lastRecord.getMeasurementValue() < 92.0 && currentRecord.getMeasurementValue() < 90.0){
-                        triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Hypotensive Hypoxemia",
-                                lastRecord.getTimestamp()));
+        if (lastRecord.getRecordType().equals("Saturation")){
+            try {
+                for (PatientRecord currentRecord : lastTenMinutes) {
+                    if (currentRecord.getRecordType().equals("SystolicPressure")) {
+                        if(lastRecord.getMeasurementValue() < 92.0 && currentRecord.getMeasurementValue() < 90.0){
+                            triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Hypotensive Hypoxemia",
+                                    lastRecord.getTimestamp()));
+                        }
                     }
                 }
-            }
 
-        }
-        catch (Exception e){
-            throw new IllegalArgumentException("There are not enough records to evaluate");
+            }
+            catch (Exception e){
+                throw new IllegalArgumentException("There are not enough records to evaluate");
+            }
+        } else {
+            try {
+                for (PatientRecord currentRecord : lastTenMinutes) {
+                    if (currentRecord.getRecordType().equals("Saturation")) {
+                        if(lastRecord.getMeasurementValue() < 90.0 && currentRecord.getMeasurementValue() < 92.0){
+                            triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Hypotensive Hypoxemia",
+                                    lastRecord.getTimestamp()));
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e){
+                throw new IllegalArgumentException("There are not enough records to evaluate");
+            }
         }
     }
 
