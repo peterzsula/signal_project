@@ -119,4 +119,19 @@ public class AlertGenerationTest {
         assert alert4.equals(new Alert("4", "Rapid drop", System.currentTimeMillis()));
     }
 
+    @Test
+    void testHypotensiveHypoxemia(){
+        DataStorage dataStorage = new DataStorage();
+        AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+        long time = System.currentTimeMillis();
+        Patient patient = new Patient(6);
+        patient.addRecord(89, "SystolicPressure", time);
+        patient.addRecord(91, "Saturation", time);
+
+
+
+        alertGenerator.evaluateData(patient);
+        Alert alert = alertGenerator.getLastAlert();
+        assert alert.equals(new Alert("6", "Hypotensive Hypoxemia", time));
+    }
 }

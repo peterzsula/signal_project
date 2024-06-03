@@ -78,7 +78,7 @@ public class Patient {
      * Adds all the records that match the given label to a new list
      * @param label the label to filter the records by
      * @param records the list of records to filter
-     * @return a list of records that match the given label
+     * @return a new list of records that match the given label
      */
     public static List<PatientRecord> filterRecordsBasedOnLabel(String label, List<PatientRecord> records) {
         List<PatientRecord> filteredRecords = new ArrayList<>();
@@ -89,6 +89,12 @@ public class Patient {
         }
         return filteredRecords;
     }
+    /**
+     * Adds all the records that match the given labels to a new list
+     * @param labels the labels to filter the records by
+     * @param records the list of records to filter
+     * @return a new list of records that match the given labels
+     */
     public static List<PatientRecord> filterRecordsBasedOnLabels(List<String> labels, List<PatientRecord> records) {
         List<PatientRecord> filteredRecords = new ArrayList<>();
         for (String label : labels) {

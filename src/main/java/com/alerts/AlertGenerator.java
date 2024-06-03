@@ -3,6 +3,7 @@ package com.alerts;
 import com.data_management.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -43,15 +44,46 @@ public class AlertGenerator {
         switch (lastRecord.getRecordType()){
             case "Saturation":
                 evaluateBloodSaturation(patient);
+                hypotensiveHypoxemiaAlert(patient);
                 break;
             case "SystolicPressure":
             case "DiastolicPressure":
                 evaluateBloodPressure(patient);
                 break;
         }
+    }
 
+    /**
+     * Evaluates the patient's blood saturation is lower than 92% and the systolic
+     * pressure is lower than 90 mmHg. If these conditions are met, an alert is
+     * triggered.
+     * This method should be called when the patient's latest record is a blood saturation record.
+     * @param patient the patient data to evaluate for alert conditions
+     */
+    private void hypotensiveHypoxemiaAlert(Patient patient){
+        List<String> labels = new ArrayList<>();
+        labels.add("Saturation");
+        labels.add("SystolicPressure");
+        List<PatientRecord> lastTenMinutes = Patient.filterRecordsBasedOnLabels(labels,
+                patient.getLastTenMinutes());
+        PatientRecord lastRecord = patient.getLastNRecords(1).get(0);
+        if (!lastRecord.getRecordType().equals("Saturation")){
+            throw new IllegalArgumentException("The last record is not a saturation record");
+        }
+        try {
+            for (PatientRecord currentRecord : lastTenMinutes) {
+                if (currentRecord.getRecordType().equals("SystolicPressure")) {
+                    if(lastRecord.getMeasurementValue() < 92.0 && currentRecord.getMeasurementValue() < 90.0){
+                        triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Hypotensive Hypoxemia",
+                                lastRecord.getTimestamp()));
+                    }
+                }
+            }
 
-
+        }
+        catch (Exception e){
+            throw new IllegalArgumentException("There are not enough records to evaluate");
+        }
     }
 
     private void evaluateBloodSaturation(Patient patient) {
