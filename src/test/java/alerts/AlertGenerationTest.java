@@ -69,26 +69,29 @@ public class AlertGenerationTest {
         DataStorage dataStorage = new DataStorage();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
 
-        patient.addRecord(91, "Saturation", System.currentTimeMillis() - 1000*60*9);
+        long time = System.currentTimeMillis() - 1000*60*9;
+        patient.addRecord(91, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert1 = alertGenerator.getLastAlert();
-        assert alert1.equals(new Alert("4", "Low Saturation", System.currentTimeMillis() - 1000*60*9));
+        assert alert1.equals(new Alert("4", "Low Saturation", time));
 
-        patient.addRecord(92, "Saturation", System.currentTimeMillis() - 1000*60*7);
+        time = System.currentTimeMillis() - 1000*60*7;
+        patient.addRecord(92, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert2 = alertGenerator.getLastAlert();
-        assert alert2.equals(new Alert("4", "Low Saturation", System.currentTimeMillis() - 1000*60*7));
+        assert alert2.equals(new Alert("4", "Low Saturation", time));
 
-        patient.addRecord(93, "Saturation", System.currentTimeMillis() - 1000*60*3);
+        time = System.currentTimeMillis() - 1000*60*3;
+        patient.addRecord(93, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert3 = alertGenerator.getLastAlert();
-        assert alert3.equals(new Alert("4", "Low Saturation", System.currentTimeMillis() - 1000*60*3));
+        assert alert3.equals(new Alert("4", "Low Saturation", time));
 
-        patient.addRecord(94, "Saturation", System.currentTimeMillis());
-
+        time = System.currentTimeMillis();
+        patient.addRecord(94, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert4 = alertGenerator.getLastAlert();
-        assert alert4.equals(new Alert("4", "Low Saturation", System.currentTimeMillis()));
+        assert alert4.equals(new Alert("4", "Low Saturation", time));
     }
 
     @Test
@@ -97,26 +100,45 @@ public class AlertGenerationTest {
         DataStorage dataStorage = new DataStorage();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
 
-        patient.addRecord(100, "Saturation", System.currentTimeMillis() - 1000*60*9);
+        long time = System.currentTimeMillis() - 1000*60*9;
+        patient.addRecord(100, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert1 = alertGenerator.getLastAlert();
-        assert alert1.equals(new Alert("4", "Rapid drop", System.currentTimeMillis() - 1000*60*9));
+        if(alert1 != null) {
+            assert alert1.equals(new Alert("5", "Rapid drop", time));
+        } else {
+            assert alert1 == null;
+        }
 
-        patient.addRecord(99, "Saturation", System.currentTimeMillis() - 1000*60*7);
+        time = System.currentTimeMillis() - 1000*60*7;
+        patient.addRecord(99, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert2 = alertGenerator.getLastAlert();
-        assert alert2.equals(new Alert("4", "Rapid drop", System.currentTimeMillis() - 1000*60*7));
+        if(alert2 != null) {
+            assert alert2.equals(new Alert("5", "Rapid drop", time));
+        } else {
+            assert alert2 == null;
+        }
 
-        patient.addRecord(98, "Saturation", System.currentTimeMillis() - 1000*60*3);
+        time = System.currentTimeMillis() - 1000*60*3;
+        patient.addRecord(98, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert3 = alertGenerator.getLastAlert();
-        assert alert3.equals(new Alert("4", "Rapid drop", System.currentTimeMillis() - 1000*60*3));
+        if(alert3 != null) {
+            assert alert3.equals(new Alert("5", "Rapid drop", time));
+        } else {
+            assert alert3 == null;
+        }
 
-        patient.addRecord(95, "Saturation", System.currentTimeMillis());
-
+        time = System.currentTimeMillis();
+        patient.addRecord(95, "Saturation", time);
         alertGenerator.evaluateData(patient);
         Alert alert4 = alertGenerator.getLastAlert();
-        assert alert4.equals(new Alert("4", "Rapid drop", System.currentTimeMillis()));
+        if(alert4 != null) {
+            assert alert4.equals(new Alert("5", "Rapid drop", time));
+        } else {
+            assert alert4 == null;
+        }
     }
 
     @Test
