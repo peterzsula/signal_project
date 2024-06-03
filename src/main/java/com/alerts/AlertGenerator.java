@@ -4,6 +4,7 @@ import com.data_management.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
@@ -38,25 +39,32 @@ public class AlertGenerator {
      * @param patient the patient data to evaluate for alert conditions
      */
     public void evaluateData(Patient patient) {
-        evaluateBloodPressure(patient);
-        evaluateBloodSaturation(patient);
+        PatientRecord lastRecord = patient.getLastNRecords(1).get(0);
+        switch (lastRecord.getRecordType()){
+            case "Saturation":
+                evaluateBloodSaturation(patient);
+                break;
+            case "SystolicPressure":
+            case "DiastolicPressure":
+                evaluateBloodPressure(patient);
+                break;
+        }
+
+
 
     }
 
     private void evaluateBloodSaturation(Patient patient) {
-        List<PatientRecord> lastTenMinutes = patient.getLastTenMinutes();
-        boolean flag = false;
-        for(PatientRecord record : lastTenMinutes) {
-            if(record.getMeasurementValue() < 92.0) {
-                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Low Saturation", System.currentTimeMillis()));
-            }
-
-            if((lastTenMinutes.get(0).getMeasurementValue() - record.getMeasurementValue() > 5 ||
-            lastTenMinutes.get(0).getMeasurementValue() - record.getMeasurementValue() < -5) &&
-            flag == false) {
-                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Rapid drop", System.currentTimeMillis()));
-                flag = true;
-            }
+        List<PatientRecord> lastTenMinutes = Patient.filterRecordsBasedOnLabel("Saturation",
+                patient.getLastTenMinutes());
+        PatientRecord lastRecord = patient.getLastNRecords(1).get(0);
+        if(Math.abs((lastTenMinutes.get(0).getMeasurementValue() - lastRecord.getMeasurementValue())) >= 5) {
+            triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Rapid drop",
+                    System.currentTimeMillis()));
+        }
+        if(lastRecord.getMeasurementValue() < 92.0) {
+            triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Low Saturation",
+                    System.currentTimeMillis()));
         }
     }
 
