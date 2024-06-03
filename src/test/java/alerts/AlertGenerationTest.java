@@ -103,42 +103,26 @@ public class AlertGenerationTest {
         long time = System.currentTimeMillis() - 1000*60*9;
         patient.addRecord(100, "Saturation", time);
         alertGenerator.evaluateData(patient);
-        Alert alert1 = alertGenerator.getLastAlert();
-        if(alert1 != null) {
-            assert alert1.equals(new Alert("5", "Rapid drop", time));
-        } else {
-            assert alert1 == null;
-        }
+        Alert alert = alertGenerator.getLastAlert();
+        assert alert == null;
 
         time = System.currentTimeMillis() - 1000*60*7;
         patient.addRecord(99, "Saturation", time);
         alertGenerator.evaluateData(patient);
-        Alert alert2 = alertGenerator.getLastAlert();
-        if(alert2 != null) {
-            assert alert2.equals(new Alert("5", "Rapid drop", time));
-        } else {
-            assert alert2 == null;
-        }
+        alert = alertGenerator.getLastAlert();
+        assert alert == null;
 
         time = System.currentTimeMillis() - 1000*60*3;
         patient.addRecord(98, "Saturation", time);
         alertGenerator.evaluateData(patient);
-        Alert alert3 = alertGenerator.getLastAlert();
-        if(alert3 != null) {
-            assert alert3.equals(new Alert("5", "Rapid drop", time));
-        } else {
-            assert alert3 == null;
-        }
+        alert = alertGenerator.getLastAlert();
+        assert alert == null;
 
         time = System.currentTimeMillis();
         patient.addRecord(95, "Saturation", time);
         alertGenerator.evaluateData(patient);
-        Alert alert4 = alertGenerator.getLastAlert();
-        if(alert4 != null) {
-            assert alert4.equals(new Alert("5", "Rapid drop", time));
-        } else {
-            assert alert4 == null;
-        }
+        alert = alertGenerator.getLastAlert();
+        assert alert.equals(new Alert("5", "Rapid drop", time));
     }
 
     @Test
@@ -147,13 +131,15 @@ public class AlertGenerationTest {
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
         long time = System.currentTimeMillis();
         Patient patient = new Patient(6);
-        patient.addRecord(89, "SystolicPressure", time);
+
         patient.addRecord(91, "Saturation", time);
-
-
-
         alertGenerator.evaluateData(patient);
         Alert alert = alertGenerator.getLastAlert();
+        assert alert.equals(new Alert("6", "Low Saturation", time));
+
+        patient.addRecord(89, "SystolicPressure", time);
+        alertGenerator.evaluateData(patient);
+        alert = alertGenerator.getLastAlert();
         assert alert.equals(new Alert("6", "Hypotensive Hypoxemia", time));
     }
 
