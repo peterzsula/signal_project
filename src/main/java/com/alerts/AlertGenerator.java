@@ -60,11 +60,11 @@ public class AlertGenerator {
         PatientRecord lastRecord = patient.getLastNRecords(1).get(0);
         if(Math.abs((lastTenMinutes.get(0).getMeasurementValue() - lastRecord.getMeasurementValue())) >= 5) {
             triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Rapid drop",
-                    System.currentTimeMillis()));
+                    lastRecord.getTimestamp()));
         }
-        if(lastRecord.getMeasurementValue() < 92.0) {
+        if(lastTenMinutes.get(0).getMeasurementValue() < 92.0) {
             triggerAlert(new Alert(String.valueOf(lastRecord.getPatientId()), "Low Saturation",
-                    System.currentTimeMillis()));
+                    lastRecord.getTimestamp()));
         }
     }
 
